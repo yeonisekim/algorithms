@@ -1,40 +1,27 @@
 // 1번 붕대 감기
 // 2025-09-01 Mon
-
-import java.util.HashMap;
-import java.util.Map;
-
 class BandageWrapping {
     public int solution(int[] bandage, int health, int[][] attacks) {
         int castTime = bandage[0];
         int healPerSecond = bandage[1];
         int extraHeal = bandage[2];
         int maxHealth = health;
+        int lastAttackTime = 0;
 
-        Map<Integer, Integer> attacksMap = new HashMap<>();
+        int timeGap;
+        int extraHealCount;
         for (int[] attack : attacks) {
-            attacksMap.put(attack[0], attack[1]);
-        }
+            timeGap = attack[0] - lastAttackTime - 1;
+            extraHealCount = timeGap / castTime;
+            lastAttackTime = attack[0];
+            
+            health = Math.min(maxHealth, health + (timeGap * healPerSecond));
+            health = Math.min(maxHealth, health + (extraHealCount * extraHeal));
 
-        int consecutiveSuccess = 0;
-        for (int i = 1; i <= attacks[attacks.length - 1][0]; i++) {
-            if (attacksMap.containsKey(i)) {
-                consecutiveSuccess = 0;
-                health -= attacksMap.get(i);
+            health -= attack[1];
 
-                if (health <= 0) {
-                    return -1;
-                }
-
-                continue;
-            }
-
-            consecutiveSuccess++;
-            health = Math.min(health + healPerSecond, maxHealth);
-
-            if (consecutiveSuccess == castTime) {
-                health = Math.min(health + extraHeal, maxHealth);
-                consecutiveSuccess = 0;
+            if (health <= 0) {
+                return -1;
             }
         }
 
